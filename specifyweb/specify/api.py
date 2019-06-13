@@ -591,8 +591,12 @@ def obj_to_data(obj):
     """Return a (potentially nested) dictionary of the fields of the
     Django model instance 'obj'.
     """
+    import types
+    if isinstance(obj, types.NoneType):
+        return None
     # Get regular and *-to-one fields.
     fields = obj._meta.get_fields()
+
     if isinstance(obj, models.Specifyuser):
         # block out password field from users table
         fields = filter(lambda f: f.name != 'password', fields)

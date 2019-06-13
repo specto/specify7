@@ -1,5 +1,6 @@
 import re
 import json
+from collections import namedtuple
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404, HttpResponseForbidden
 from django.utils.http import is_safe_url
@@ -26,16 +27,22 @@ from .schema_localization import get_schema_localization
 def set_collection_cookie(response, collection_id):
     response.set_cookie('collection', str(collection_id), max_age=365*24*60*60)
 
+UserCollection = namedtuple('UserCollection', 'collectionid collectionname agent_count')
+
 def users_collections(cursor, user_id):
     cursor.execute("""
-    select distinct c.usergroupscopeid, c.collectionname from collection c
+    select c.usergroupscopeid, c.collectionname, count(agent.agentid) from collection c
     inner join spprincipal p on p.usergroupscopeid = c.usergroupscopeid
     inner join specifyuser_spprincipal up on up.spprincipalid = p.spprincipalid
     inner join specifyuser u on u.specifyuserid = up.specifyuserid and p.grouptype is null
+    inner join discipline disc on c.disciplineid = disc.usergroupscopeid
+    left  join agent on agent.specifyuserid = u.specifyuserid and agent.divisionid = disc.divisionid
     where up.specifyuserid = %s
+    group by c.usergroupscopeid
     """, [user_id])
 
-    return list(cursor.fetchall())
+    rows = cursor.fetchall()
+    return [UserCollection(*row) for row in rows]
 
 def set_users_collections(cursor, user, collectionids):
     with transaction.atomic():
@@ -69,7 +76,7 @@ def user_collection_access(request, userid):
         set_users_collections(cursor, user, collections)
 
     collections = users_collections(cursor, userid)
-    return HttpResponse(json.dumps([row[0] for row in collections]),
+    return HttpResponse(json.dumps([row.collectionid for row in collections]),
                         content_type="application/json")
 
 class CollectionChoiceField(forms.ChoiceField):
@@ -87,15 +94,18 @@ def choose_collection(request):
         else settings.LOGIN_REDIRECT_URL
     )
 
-    available_collections = users_collections(connection.cursor(), request.specify_user.id)
+    all_collections = users_collections(connection.cursor(), request.specify_user.id)
+    available_collections = [(c.collectionid, c.collectionname) for c in all_collections if c.agent_count == 1]
+    no_agents = [c.collectionname for c in all_collections if c.agent_count < 1]
+    multiple_agents = [c.collectionname for c in all_collections if c.agent_count > 1]
 
     if len(available_collections) < 1:
         auth_logout(request)
-        return TemplateResponse(request, 'choose_collection.html', context={'next': redirect_to})
+        # return TemplateResponse(request, 'choose_collection.html', context={'next': redirect_to})
 
-    if len(available_collections) == 1:
-        set_collection_cookie(redirect_resp, available_collections[0][0])
-        return redirect_resp
+    # if len(available_collections) == 1:
+    #     set_collection_cookie(redirect_resp, available_collections[0][0])
+    #     return redirect_resp
 
     class Form(forms.Form):
         collection = CollectionChoiceField(
@@ -107,10 +117,12 @@ def choose_collection(request):
         if form.is_valid():
             set_collection_cookie(redirect_resp, form.cleaned_data['collection'])
             return redirect_resp
-    else:
+    elif len(available_collections) > 0:
         form = Form()
+    else:
+        form = None
 
-    context = {'form': form, 'next': redirect_to}
+    context = {'form': form, 'next': redirect_to, 'no_agents': no_agents, 'multiple_agents': multiple_agents}
     return TemplateResponse(request, 'choose_collection.html', context)
 
 @require_http_methods(['GET', 'PUT'])

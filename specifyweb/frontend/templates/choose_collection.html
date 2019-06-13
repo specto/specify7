@@ -33,14 +33,30 @@
         <input type="submit" value="Select" />
       </div>
     </form>
-    {% else %}
+    {% endif %}
+    {% if no_agents %}
     <p>
-      The logged in user has not been given access to any collections
-      in this database. You must
-      <a href="/accounts/login/?next={{ next|urlencode }}">login</a> as another user.
+      The following collections are inaccessible because the user
+      has not been assigned an agent record:
     </p>
+    <ul>
+      {% for collection in no_agents %}
+      <li>{{ collection }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if multiple_agents %}
+    <p>
+      The following collections are inaccessible because the user
+      has been assigned multiple agent records:
+    </p>
+    <ul>
+      {% for collection in multiple_agents %}
+      <li>{{ collection }}</li>
+      {% endfor %}
+    </ul>
     {% endif %}
   </div>
 </body>
 </html>
-
