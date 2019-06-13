@@ -22,10 +22,14 @@ var whenall  = require('./whenall.js');
             // for the QueryCBX to work with;
             this.model = new schema.models.AgentAttachment.Resource();
             this.agent && this.model.set('agent', this.agent);
+            this.model.on('change:agent', this.agentChanged, this);
         },
         render: function() {
             $('<td>').text(this.division.get('name')).appendTo(this.el);
             var control = $('<td><input type="text" name="agent"></td>').appendTo(this.el);
+            $('<td class="agent-warning"><span class="ui-icon ui-icon-alert">Agent in use.</span></td>')
+                .appendTo(this.el)
+                .hide();
 
             new QueryCbx({
                 populateForm: this.populateForm,
@@ -38,6 +42,13 @@ var whenall  = require('./whenall.js');
             }).render();
 
             return this;
+        },
+        agentChanged: function() {
+            this.model.rget('agent', true).done(agent => {
+                const warning = agent.get('specifyuser') != null;
+                this.$('.agent-warning').toggle(warning);
+                this.trigger('agent-warning', warning);
+            });
         },
         save: function(user) {
             if (this.model.get('agent') != (this.agent && this.agent.get('resource_uri'))) {
@@ -67,12 +78,21 @@ var whenall  = require('./whenall.js');
             this.$el.attr('title', "Set User Agents");
             var controls = _.map(this.divInfos, function(divInfo) { return new AgentForDiv(divInfo); });
             _.invoke(controls, 'render');
+            _.invoke(controls, 'on', 'agent-warning',
+                     () => this.$('.agent-warning-message').toggle(this.$('.agent-warning:visible').length > 0)
+                    );
+
             $('<table>').append(_.pluck(controls, 'el')).appendTo(this.el);
+
+            $(`<p class="agent-warning-message"><span class="ui-icon ui-icon-alert">Agent in use.</span>
+WARNING: The agent is already in use
+by another user. That user will no longer be able to log in to the
+division unless they are assigned a new user.</p>`).hide().appendTo(this.el);
 
             var user = this.user;
             this.$el.dialog({
                 modal: true,
-                width: 'auto',
+                width: 360,
                 minHeight: 175,
                 close: function() { $(this).remove(); },
                 buttons: [
