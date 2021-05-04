@@ -4,7 +4,11 @@ var $ = require('jquery');
 
 global.jQuery = $;
 require('jquery-contextmenu');
-require('jquery-ui');
+require('jquery-ui/ui/widgets/dialog');
+require('jquery-ui/ui/widgets/tooltip');
+require('jquery-ui/ui/widgets/progressbar');
+require('jquery-ui/ui/widgets/autocomplete');
+require('jquery-ui/ui/widgets/slider');
 
 var userInfo     = require('./userinfo.js');
 var populateForm = require('./populateform.js');
