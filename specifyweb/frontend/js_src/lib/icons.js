@@ -1,8 +1,8 @@
 "use strict";
 
-var $              = require('jquery');
-var _              = require('underscore');
-var initialContext = require('./initialcontext.js');
+import $ from 'jquery';
+import _ from 'underscore';
+import * as initialContext from './initialcontext';
 
     var iconGroups = {};
     initialContext
@@ -32,8 +32,7 @@ var initialContext = require('./initialcontext.js');
         return iconNode;
     }
 
-module.exports = {
-        getIcon: function (icon) {
+        export function getIcon(icon) {
             var group, iconFile;
             _.find(iconGroups, function(xml, name) {
                 var iconNode = findIconInXML(icon, xml);
@@ -52,5 +51,4 @@ module.exports = {
                 return '/images/unknown.png';
             }
         }
-    };
 

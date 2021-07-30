@@ -1,15 +1,15 @@
 "use strict";
 
-var $         = require('jquery');
-var _         = require('underscore');
-var Backbone  = require('./backbone.js');
+import $ from 'jquery';
+import _ from 'underscore';
+import Backbone from './backbone';
 
 
-var template      = require('./templates/queryresults.html');
-var ScrollResults = require('./scrollresults.js');
-var QueryResults  = require('./queryresults.js');
-const queryText = require('./localization/query').default;
-const commonText = require('./localization/common').default;
+import template from './templates/queryresults.html';
+import ScrollResults from './scrollresults';
+import QueryResults from './queryresults';
+import queryText from './localization/query';
+import commonText from './localization/common';
 
     function renderHeader(fieldSpec) {
         var field = _.last(fieldSpec.joinPath);
@@ -23,7 +23,7 @@ const commonText = require('./localization/common').default;
         return th;
     }
 
-    var QueryResultsTable = Backbone.View.extend({
+    export default Backbone.View.extend({
         __name__: "QueryResultsTable",
         className: "query-results-table",
         initialize: function(options) {
@@ -85,6 +85,3 @@ const commonText = require('./localization/common').default;
             this.gotDataBefore = true;
         }
     });
-
-module.exports =  QueryResultsTable;
-

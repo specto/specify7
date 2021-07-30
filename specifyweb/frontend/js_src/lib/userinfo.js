@@ -1,7 +1,7 @@
 "use strict";
 
-var _              = require('underscore');
-var initialContext = require('./initialcontext.js');
+import _ from 'underscore';
+import * as initialContext from './initialcontext';
 
     var userInfo = {};
     initialContext.load('user.json', function(data) {
@@ -10,4 +10,4 @@ var initialContext = require('./initialcontext.js');
         });
     });
 
-module.exports = userInfo;
+export default userInfo;

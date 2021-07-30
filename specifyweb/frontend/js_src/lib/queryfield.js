@@ -1,16 +1,15 @@
 "use strict";
 
-var $        = require('jquery');
-var _        = require('underscore');
-var Backbone = require('./backbone.js');
+import $ from 'jquery';
+import _ from 'underscore';
+import Backbone from './backbone';
 
-var template          = require('./templates/queryfield.html');
-var schema            = require('./schema.js');
-var domain            = require('./domain.js');
-var QueryFieldSpec    = require('./queryfieldspec.js');
-var QueryFieldInputUI = require('./queryfieldinput.js');
-const queryText = require('./localization/query').default;
-const commonText = require('./localization/common').default;
+import template from './templates/queryfield.html';
+import { getTreeDef } from './domain';
+import QueryFieldSpec from './queryfieldspec';
+import QueryFieldInputUI from './queryfieldinput';
+import queryText from './localization/query';
+import commonText from './localization/common';
 
     var SORT_ICONS = ["ui-icon-bullet", "ui-icon-carat-1-n", "ui-icon-carat-1-s"];
 
@@ -23,7 +22,7 @@ const commonText = require('./localization/common').default;
         catnos: []
     };
 
-module.exports =  Backbone.View.extend({
+export default Backbone.View.extend({
         __name__: "QueryField",
         events: {
             'click .field-expand': 'expandToggle',
@@ -199,7 +198,7 @@ module.exports =  Backbone.View.extend({
                 });
 
             var fieldGrp = this.$('.field-select-grp');
-            var getTreeDef = domain.getTreeDef(this.fieldSpec.table.name);
+            var getTreeDef = getTreeDef(this.fieldSpec.table.name);
             $.when( getTreeDef && this.addTreeLevelsToFieldSelect(getTreeDef) ).done(function() {
                 fieldGrp.show();
             });
