@@ -198,15 +198,15 @@ export default Backbone.View.extend({
                 });
 
             var fieldGrp = this.$('.field-select-grp');
-            var getTreeDef = getTreeDef(this.fieldSpec.table.name);
-            $.when( getTreeDef && this.addTreeLevelsToFieldSelect(getTreeDef) ).done(function() {
+            var treeDef = getTreeDef(this.fieldSpec.table.name);
+            $.when( treeDef && this.addTreeLevelsToFieldSelect(treeDef) ).done(function() {
                 fieldGrp.show();
             });
         },
-        addTreeLevelsToFieldSelect: function(getTreeDef) {
+        addTreeLevelsToFieldSelect: function(treeDef) {
             var optGroup = $('<optgroup label="Tree Ranks">').appendTo( this.$('.field-select') );
 
-            getTreeDef.pipe(function(treeDef) {
+            treeDef.pipe(function(treeDef) {
                 return treeDef.rget('treedefitems');
             }).pipe(function (treeDefItems) {
                 return treeDefItems.fetch({limit: 0}).pipe(function() { return treeDefItems; });
@@ -238,7 +238,7 @@ export default Backbone.View.extend({
         },
         setupDatePartState: function() {
             var select = this.$('.datepart-select').empty();
-            var options = _(['Extract...', 'Full Date', 'Year', 'Month', 'Day']).each(function(datepart) {
+            _(['Extract...', 'Full Date', 'Year', 'Month', 'Day']).each(function(datepart) {
                 $('<option>', {value: datepart}).text(datepart).appendTo(select);
             });
         },
@@ -327,7 +327,7 @@ export default Backbone.View.extend({
 
         // External event handlers.
 
-        valueChanged: function(inputUI, value) {
+        valueChanged: function(_inputUI, value) {
             this.value = value;
             this.spqueryfield.set('startvalue', value);
             console.log('updating value to', value);

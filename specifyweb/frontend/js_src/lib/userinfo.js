@@ -1,7 +1,7 @@
 "use strict";
 
 import _ from 'underscore';
-import * as initialContext from './initialcontext';
+import initialContext from './initialcontext';
 
     var userInfo = {};
     initialContext.load('user.json', function(data) {
