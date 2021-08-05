@@ -160,6 +160,7 @@ const commonText = createDictionary({
   running: 'Running...',
   noMatches: 'No Matches',
   searchQuery: 'Search Query',
+  unknown: 'Unknown',
 
   // Unload Protection
   leavePageDialogTitle: 'Unsaved changes detected',
