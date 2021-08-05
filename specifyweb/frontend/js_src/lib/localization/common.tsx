@@ -57,6 +57,8 @@ const commonText = createDictionary({
   metadata: 'Metadata',
   query: 'Query',
   unmapped: 'Unmapped',
+  expand: 'Expand',
+  geoMap: 'GeoMap',
 
   // Toolbar
   notifications: (count: number) => `Notifications: ${count}`,
@@ -96,8 +98,8 @@ const commonText = createDictionary({
   queriesDialogTitle: (count: number) => `Queries (${count})`,
   newQueryDialogTitle: 'New Query Type',
   exportQueryForDwca: 'Export query for DwCA definition.',
-  exportQueryForDwcaDialogTitle: 'Query XML for DwCA definition.',
-  exportQueryForDwcaDialogHeader: createHeader(''),
+  exportQueryForDwcaDialogTitle: 'Query XML for DwCA definition',
+  exportQueryForDwcaDialogHeader: createHeader('Query XML for DwCA definition'),
   exportQueryAsReport: 'Define report based on query.',
   exportQueryAsLabel: 'Define label based on query.',
   newResourceTitle: (resourceName: string) => `New ${resourceName}`,
@@ -157,6 +159,7 @@ const commonText = createDictionary({
   secondarySearch: 'Secondary Search',
   running: 'Running...',
   noMatches: 'No Matches',
+  searchQuery: 'Search Query',
 
   // Unload Protection
   leavePageDialogTitle: 'Unsaved changes detected',
