@@ -65,7 +65,7 @@ module.exports =  UIPlugin.extend({
     },
     render: function() {
         Q.all([this.user.fetch(), this.allCollections.fetch({limit:0})]).then(() => {
-            this.$el.attr('value', adminText('collections'));
+            this.el.innerText = adminText('collections');
             this.user.isNew() && this.$el.attr('title', adminText('saveUserFirst')).prop('disabled', true);
         });
         return this;
