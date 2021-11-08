@@ -175,6 +175,7 @@ const commonText = createDictionary({
   move: {
     'en-us': 'Move',
   },
+
   // Toolbar
   notifications: {
     'en-us': (count: number) => `Notifications: ${count}`,
@@ -334,6 +335,9 @@ const commonText = createDictionary({
   },
   manageUsersDialogTitle: {
     'en-us': 'Manage Users',
+  },
+  query: {
+    'en-us': 'Query',
   },
   workbench: {
     'en-us': 'WorkBench',
