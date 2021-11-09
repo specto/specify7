@@ -29,7 +29,7 @@ module.exports = Backbone.View.extend({
         __name__: "FormsDialog",
         tagName: 'nav',
         className: "forms-dialog",
-        events: {'click button': 'selected'},
+        events: {'click a': 'handleClick'},
         render: function() {
             var render = this._render.bind(this);
             getFormsPromise().done(render);
@@ -37,8 +37,10 @@ module.exports = Backbone.View.extend({
         },
         _render: function(forms) {
             this.forms = forms;
-            var entries = _.map(views, this.dialogEntry, this);
-            $('<ul>').css('padding',0).append(entries).appendTo(this.el);
+            $('<ul>')
+                .css('padding',0)
+                .append(views.map((view,index)=>this.dialogEntry(view, index)))
+            .appendTo(this.el);
             this.$el.dialog({
                 title: formsText('formsDialogTitle'),
                 maxHeight: 400,
@@ -51,11 +53,16 @@ module.exports = Backbone.View.extend({
             });
             return this;
         },
-        dialogEntry: function(view) {
+        dialogEntry: function(view,index) {
+            const form = this.forms[index];
+            const modelName = form['class'].split('.').pop();
+            const model = schema.getModel(modelName);
             return $('<li>').append(
-                $('<button>')
-                    .addClass("fake-link")
+                $('<a>')
+                    .addClass("fake-link intercept-navigation")
+                    .attr('href', new model.Resource().viewUrl())
                     .css({fontSize: '0.8rem'})
+                    .attr('data-model-name', modelName)
                     .append(
                         $(
                             '<img>',
@@ -70,12 +77,13 @@ module.exports = Backbone.View.extend({
                     )
             )[0];
         },
-        selected: function(evt) {
-            var index = this.$('button').index(evt.currentTarget);
-            this.$el.dialog('close');
-            var form = this.forms[index];
-            var model = schema.getModel(form['class'].split('.').pop());
-            this.trigger('selected', model);
-        }
+        handleClick(event){
+            if(typeof this.options.onSelected === 'undefined')
+                return;
+            event.preventDefault();
+            const modelName = event.target.getAttribute('data-model-name');
+            const model = schema.getModel(modelName);
+            this.options.onSelected(model);
+        },
     });
 
