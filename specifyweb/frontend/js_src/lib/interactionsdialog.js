@@ -55,11 +55,18 @@ module.exports = Backbone.View.extend({
         tagName: 'nav',
         className: "interactions-dialog",
         events: {
-            'click button.interaction-action': 'interactionActionClick'
+            'click a.interaction-action': 'interactionActionClick'
         },
         render: function() {
-            var render = this._render.bind(this);
-            getFormsPromise().done(render);
+            if(typeof this.options.action === 'undefined'){
+                const render = this._render.bind(this);
+                getFormsPromise().done(render);
+            }
+            else {
+                const action = interaction_entries
+                    .find(a=>a[0].getAttribute('action')==='NEW_LOAN');
+                this.handleAction(action);
+            }
             return this;
         },
         _render: function(forms) {
@@ -105,27 +112,28 @@ module.exports = Backbone.View.extend({
             return '';
         },
         dialogEntry: function(interactionEntry, formIndex) {
-            let tagName = 'button';
             let className = 'interaction-action';
-            let attributes = 'type="button"';
+            let href='';
 
-            if(!isActionEntry(interactionEntry)){
+            if(isActionEntry(interactionEntry)) {
+                const action = interactionEntry[0].getAttribute('action');
+                href = `/specify/task/interactions/${action}`;
+            }
+            else {
               const form = this.forms[formIndex];
               const model = schema.getModel(form['class'].split('.').pop());
-              const href = new model.Resource().viewUrl();
 
-              attributes = `href="${href}"`;
-              tagName = 'a';
+              href = new model.Resource().viewUrl();
               className = 'intercept-navigation';
             }
 
             return `<li
                 title="${this.getDialogEntryTooltip(interactionEntry)}"
             >
-                <${tagName}
+                <a
                     class="${className} fake-link"
                     style="font-size: 0.8rem"
-                    ${attributes}
+                    href="${href}"
                 >
                     <img
                         alt="${interactionEntry.attr('icon')}"
@@ -134,23 +142,19 @@ module.exports = Backbone.View.extend({
                         aria-hidden="true"
                     > 
                     ${this.getDialogEntryText(interactionEntry)}
-                </${tagName}>
+                </a>
             </li>`;
-        },
-        selected: function(evt) {
-            var index = this.$('button').filter(".intercept-navigation").index(evt.currentTarget);
-            this.$el.dialog('close');
-            var form = this.forms[index];
-            var model = schema.getModel(form['class'].split('.').pop());
-            this.trigger('selected', model);
         },
         isRsAction: function(actionName) {
             return actionName == 'NEW_GIFT' || actionName == 'NEW_LOAN';
         },
-        interactionActionClick: function(evt) {
-            var index = this.$('button').filter(".interaction-action").index(evt.currentTarget);
+        interactionActionClick(event) {
+            event.preventDefault();
+            const index = this.$('a').filter(".interaction-action").index(event.currentTarget);
             this.$el.dialog('close');
-            var action = actions[index];
+            this.handleAction(actions[index]);
+        },
+        handleAction(action){
             var isRsAction = this.isRsAction(action.attr('action'));
             if (isRsAction || action.attr('action') == 'RET_LOAN') {
                 var tblId = isRsAction ? 1 : 52;
