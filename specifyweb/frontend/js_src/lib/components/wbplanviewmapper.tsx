@@ -16,6 +16,7 @@ import type {
 import { getMappingLineData } from '../wbplanviewnavigator';
 import type { AutoScrollTypes, RefMappingState } from '../wbplanviewrefreducer';
 import { getMappedFields, mappingPathIsComplete } from '../wbplanviewutils';
+import { useId } from './common';
 import type { IR, RA } from './wbplanview';
 import type { MappingPathProps } from './wbplanviewcomponents';
 import { MappingLineComponent } from './wbplanviewcomponents';
@@ -245,6 +246,8 @@ export default function WbPlanViewMapper(
       window.removeEventListener('resize', repositionSuggestionBox);
   }, []);
 
+  const id = useId('wbplanviewmapper');
+
   return (
     <>
       {!props.readonly && props.validationResults.length > 0 && (
@@ -423,7 +426,7 @@ export default function WbPlanViewMapper(
                             undefined
                           }
                         />{' '}
-                        {wbText('useDefaultValue')}
+                        <span id={id(`default-value-${index}`)}>{wbText('useDefaultValue')}</span>
                         {columnOptions.default !== null && ':'}
                       </label>
                       {typeof columnOptions.default === 'string' && (
@@ -432,7 +435,7 @@ export default function WbPlanViewMapper(
                           <textarea
                             value={columnOptions.default || ''}
                             title={wbText('defaultValue')}
-                            aria-label={wbText('defaultValue')}
+                            aria-labelledby={id(`default-value-${index}`)}
                             onChange={
                               (!props.readonly &&
                                 ((event): void =>
