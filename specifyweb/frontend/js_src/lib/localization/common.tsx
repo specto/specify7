@@ -273,7 +273,7 @@ const commonText = createDictionary({
   },
   updateExportFeed: {
     'en-us': 'Update Feed Now',
-    'ru-ru': 'Обновить фид сейчас',
+    'ru-ru': 'Обновить фид',
   },
   updateExportFeedDialogTitle: {
     'en-us': 'Export Feed',
